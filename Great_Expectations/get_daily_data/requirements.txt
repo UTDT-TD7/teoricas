@@ -1,0 +1,5 @@
+polygon-api-client
+pandas
+psycopg2
+sqlalchemy
+great_expectations==0.18.8

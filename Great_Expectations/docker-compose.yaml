@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  postgres:
+    build:
+      context: postgres
+    ports:
+      - 5438:5432
+    volumes:
+      - ./postgres/init_db:/docker-entrypoint-initdb.d
+      - postgres_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=S3cret
+      - POSTGRES_USER=catedra
+      - POSTGRES_DB=catedra
+    networks:
+      finance:
+        ipv4_address: 172.25.0.2
+  get_daily_data:
+    build:
+      context: get_daily_data
+    volumes:
+      - ./gx:/usr/src/app/gx
+    networks:
+      finance:
+        ipv4_address: 172.25.0.3
+    depends_on:
+      - postgres
+    command: >
+             sh -c "python etl.py & python ge.py"
+
+networks:
+  finance:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.25.0.0/24"
+volumes:
+    postgres_volume:
+        external: false
